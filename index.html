@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="robots" content="noindex, nofollow">
+<title>Souza Engenharia</title>
+<link rel="icon" type="image/png" href="https://portal.souzaengenharia.com/img/favicon.png">
+<link rel="stylesheet" href="https://portal.souzaengenharia.com/css/estilo.css">
+</head>
+<body>
+<div id="app"><div class="login"><img src="https://portal.souzaengenharia.com/img/logo.png" alt="Souza Engenharia" style="width:200px;opacity:.9"></div></div>
+<script>
+/* Endereço antigo do sistema (breno.souzaengenharia.com).
+   O sistema agora fica em portal.souzaengenharia.com. Antes de levar para lá,
+   envia o que ainda estiver só neste aparelho (alterações e fotos do Diário de obra). */
+(function () {
+  var PORTAL = 'https://portal.souzaengenharia.com/';
+  function ir() { location.replace(PORTAL + location.pathname.replace(/^\/+/, '') + location.search + location.hash); }
+  // a cópia antiga do sistema guardada no aparelho deixa de abrir sozinha
+  try { navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }); } catch (e) { /* ignora */ }
+  function carregar() {
+    window.SOUZA_RAIZ = PORTAL;
+    window.SOUZA_SEM_SW = true;
+    var js = ['js/config.js', 'js/nucleo.js', 'js/rdo-dados.js'], v = '?m=' + Date.now();
+    (function prox(i) {
+      if (i >= js.length) { try { window.Sis.mudar(PORTAL); } catch (e) { ir(); } return; }
+      var s = document.createElement('script');
+      s.src = PORTAL + js[i] + v;
+      s.onload = function () { prox(i + 1); };
+      s.onerror = ir;
+      document.head.appendChild(s);
+    })(0);
+  }
+  // aparelho que nunca usou o sistema neste endereço: vai direto
+  try {
+    indexedDB.databases().then(function (dbs) {
+      if (dbs.some(function (d) { return /^souza-/.test(d.name || ''); })) carregar(); else ir();
+    }, carregar);
+  } catch (e) { carregar(); }
+})();
+</script>
+</body>
+</html>
